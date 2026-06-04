@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>D&D Stat Roller</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Scala+Sans:wght@700&family=Bree+Serif&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ededed;
+    --paper: #ffffff;
+    --ink: #1b1b1f;
+    --ink-soft: #4a4a52;
+    --muted: #75757a;
+    --crimson: #c53131;
+    --crimson-dark: #9b2424;
+    --border: #d6d6d6;
+    --shadow: 0 1px 3px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.08);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: 'Roboto Condensed', 'Arial Narrow', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    -webkit-text-size-adjust: 100%;
+  }
+  .topbar {
+    background: #1b1b1f;
+    color: #fff;
+    padding: .75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 4px solid var(--crimson);
+    flex-wrap: wrap;
+  }
+  @media (max-width: 600px) {
+    .topbar { padding: .6rem .85rem; gap: .5rem; }
+    .topbar .crumbs { display: none; }
+    .topbar .brand { font-size: 1.15rem; }
+  }
+  .topbar .brand {
+    font-family: 'Bree Serif', 'Georgia', serif;
+    font-size: 1.4rem;
+    letter-spacing: .02em;
+  }
+  .topbar .brand .amp { color: var(--crimson); }
+  .topbar .crumbs {
+    color: #a0a0a8;
+    font-size: .85rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+  .topbar .spacer { flex: 1; }
+  .lang-switch {
+    display: flex;
+    gap: .15rem;
+    background: rgba(255,255,255,.05);
+    border: 1px solid #3a3a40;
+    border-radius: 2px;
+    padding: 2px;
+  }
+  .lang-switch button {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    font-size: .75rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: .5rem .7rem;
+    min-height: 36px;
+    min-width: 36px;
+    background: transparent;
+    color: #a0a0a8;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .lang-switch button:hover { color: #fff; }
+  .lang-switch button.active {
+    background: var(--crimson);
+    color: #fff;
+  }
+  .container {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+  @media (max-width: 600px) {
+    .container { padding: 1.25rem .9rem 2.5rem; }
+    .page-title { font-size: 1.55rem; }
+    .lede { font-size: .75rem; margin-bottom: 1.25rem; }
+  }
+  .page-title {
+    font-family: 'Bree Serif', 'Georgia', serif;
+    font-size: 2rem;
+    margin: 0 0 .25rem;
+    color: var(--ink);
+  }
+  .page-title .accent { color: var(--crimson); }
+  .lede {
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: .85rem;
+    margin: 0 0 2rem;
+  }
+
+  /* Ability score grid – DDB style */
+  .abilities {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: .75rem;
+    margin-bottom: 1.75rem;
+  }
+  @media (max-width: 720px) {
+    .abilities { grid-template-columns: repeat(3, 1fr); gap: .55rem; }
+  }
+  @media (max-width: 420px) {
+    .abilities { grid-template-columns: repeat(2, 1fr); gap: .5rem; }
+    .ability { padding: .6rem .35rem 1.4rem; }
+    .ability-mod { font-size: 2.3rem; }
+    .ability-rolls .die { min-width: 16px; font-size: .7rem; }
+  }
+
+  .ability {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--ink);
+    border-radius: 2px;
+    box-shadow: var(--shadow);
+    padding: .75rem .5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .ability:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,.15);
+  }
+  .ability.rolling .ability-mod { animation: pop .45s ease; }
+  @keyframes pop {
+    0% { transform: scale(.6); opacity: .2; }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .ability-name {
+    font-family: 'Scala Sans', 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    font-size: .75rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-bottom: .35rem;
+  }
+  .ability-mod {
+    font-family: 'Bree Serif', serif;
+    font-size: 2.6rem;
+    font-weight: 400;
+    line-height: 1;
+    color: var(--ink);
+    margin: .2rem 0 .65rem;
+  }
+  .ability-score {
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--ink);
+  }
+  .ability-rolls {
+    margin-top: .85rem;
+    font-size: .72rem;
+    color: var(--muted);
+    letter-spacing: .03em;
+    display: flex;
+    gap: .25rem;
+  }
+  .ability-rolls .die {
+    display: inline-block;
+    min-width: 18px;
+    padding: 1px 4px;
+    text-align: center;
+    background: #f3f3f3;
+    border-radius: 2px;
+  }
+  .ability-rolls .die.dropped {
+    text-decoration: line-through;
+    opacity: .45;
+  }
+  .ability-adjust {
+    margin-top: .25rem;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+  }
+  .ability-adjust.plus { color: #2f7a2f; }
+  .ability-adjust.minus { color: var(--crimson); }
+  .ability-adjust.zero { color: var(--muted); }
+
+  /* Summary bar */
+  .summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--crimson);
+    padding: .85rem 1.25rem;
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+  }
+  .summary-label {
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-size: .8rem;
+    color: var(--muted);
+  }
+  .summary-value {
+    font-family: 'Bree Serif', serif;
+    font-size: 1.5rem;
+    color: var(--ink);
+  }
+  .summary-value .target {
+    color: var(--muted);
+    font-size: 1rem;
+  }
+
+  /* Roll button */
+  .controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .btn-roll {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    padding: .95rem 2.25rem;
+    background: var(--crimson);
+    color: #fff;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    box-shadow: 0 2px 0 var(--crimson-dark), var(--shadow);
+    transition: transform .1s, box-shadow .1s, background .15s;
+  }
+  .btn-roll:hover { background: #d63a3a; }
+  .btn-roll:active {
+    transform: translateY(2px);
+    box-shadow: 0 0 0 var(--crimson-dark), var(--shadow);
+  }
+  .btn-roll:disabled { opacity: .6; cursor: wait; }
+  @media (max-width: 600px) {
+    .btn-roll { width: 100%; padding: 1.05rem 1rem; font-size: 1rem; }
+    .controls { margin: 1.25rem 0; }
+    .summary { padding: .75rem 1rem; }
+    .summary-label { font-size: .72rem; }
+    .summary-value { font-size: 1.25rem; }
+    .info { padding: 1rem 1.1rem; }
+    .info p { font-size: .9rem; }
+  }
+
+  /* Info card */
+  .info {
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--crimson);
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow);
+  }
+  .info h2 {
+    font-family: 'Bree Serif', serif;
+    color: var(--crimson);
+    margin: 0 0 .5rem;
+    font-size: 1.15rem;
+    letter-spacing: .02em;
+  }
+  .info p {
+    margin: .35rem 0;
+    color: var(--ink-soft);
+    font-size: .95rem;
+    line-height: 1.5;
+  }
+  .info strong { color: var(--ink); }
+
+  /* History */
+  .history {
+    margin-top: 1.5rem;
+    background: var(--paper);
+    border: 1px solid var(--border);
+    border-top: 3px solid var(--ink);
+    box-shadow: var(--shadow);
+  }
+  .history-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: .85rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .history-head h2 {
+    font-family: 'Bree Serif', serif;
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--ink);
+  }
+  .history-head .count {
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: var(--muted);
+  }
+  .btn-clear {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    font-size: .7rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: .45rem .75rem;
+    background: transparent;
+    color: var(--crimson);
+    border: 1px solid var(--crimson);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .btn-clear:hover { background: var(--crimson); color: #fff; }
+  .history-list { list-style: none; margin: 0; padding: 0; max-height: 360px; overflow-y: auto; }
+  .history-empty {
+    padding: 1.25rem;
+    color: var(--muted);
+    text-align: center;
+    font-style: italic;
+    font-size: .9rem;
+  }
+  .history-item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: .75rem;
+    padding: .65rem 1.25rem;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+    transition: background .12s;
+  }
+  .history-item:last-child { border-bottom: none; }
+  .history-item:hover { background: #fafafa; }
+  .history-time {
+    font-size: .72rem;
+    color: var(--muted);
+    letter-spacing: .03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .history-scores {
+    display: flex;
+    gap: .25rem;
+    flex-wrap: wrap;
+  }
+  .history-score {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 32px;
+    padding: 2px 4px;
+    background: #f3f3f3;
+    border-radius: 2px;
+    font-family: 'Roboto Condensed', sans-serif;
+  }
+  .history-score .k {
+    font-size: .55rem;
+    letter-spacing: .08em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .history-score .v {
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--ink);
+    line-height: 1.1;
+  }
+  .history-score.top { background: #fde9e9; }
+  .history-score.top .v { color: var(--crimson); }
+  .history-restore {
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--crimson);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  @media (max-width: 600px) {
+    .history-head { padding: .7rem .9rem; }
+    .history-item { grid-template-columns: 1fr auto; padding: .65rem .9rem; gap: .4rem .6rem; }
+    .history-time { grid-column: 1 / -1; }
+    .history-score { min-width: 28px; }
+    .history-score .v { font-size: .85rem; }
+  }
+</style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand">D<span class="amp">&amp;</span>D <span data-i18n="brand">Stat Roller</span></div>
+    <div class="crumbs" data-i18n="crumbs">Character Creation › Ability Scores</div>
+    <div class="spacer"></div>
+    <div class="lang-switch" id="langSwitch">
+      <button data-lang="en">EN</button>
+      <button data-lang="de">DE</button>
+      <button data-lang="es">ES</button>
+      <button data-lang="fr">FR</button>
+      <button data-lang="zh">中文</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <h1 class="page-title"><span data-i18n="title1">Roll Your</span> <span class="accent" data-i18n="title2">Ability Scores</span></h1>
+    <p class="lede" data-i18n="lede">4d6 drop lowest · balanced to a total of 72</p>
+
+    <div class="abilities" id="abilities"></div>
+
+    <div class="summary">
+      <span class="summary-label" data-i18n="totalLabel">Total Ability Score</span>
+      <span class="summary-value"><span id="total">—</span> <span class="target">/ 72</span></span>
+    </div>
+
+    <div class="controls">
+      <button class="btn-roll" id="rollBtn" data-i18n="rollBtn">Roll Ability Scores</button>
+    </div>
+
+    <div class="info">
+      <h2 data-i18n="infoTitle">How These Scores Are Generated</h2>
+      <p data-i18n="info1"><strong>Step 1 — Roll:</strong> Each ability uses the classic <strong>4d6 drop lowest</strong> method — four six-sided dice are rolled and the lowest is discarded.</p>
+      <p data-i18n="info2"><strong>Step 2 — Proportional scaling:</strong> The six raw results are multiplied by <strong>72 / sum of raw rolls</strong>, so the total always equals 72 (same as the Standard Array: 15, 14, 13, 12, 10, 8).</p>
+      <p data-i18n="info3"><strong>Step 3 — Round &amp; fix:</strong> Scaled values are rounded to integers and clamped to 3–18. Any rounding leftover is corrected on whichever stat was rounded the most, so the total lands exactly on 72.</p>
+      <p data-i18n="info4"><strong>Why this is fair:</strong> The <em>shape</em> of your roll stays intact — the highest stat stays highest, the lowest stays lowest. A lucky roll just gets compressed, an unlucky one gets stretched. No more accidental Hercules vs. weakling.</p>
+    </div>
+
+    <div class="history">
+      <div class="history-head">
+        <h2 data-i18n="historyTitle">Roll History</h2>
+        <span class="count"><span id="historyCount">0</span> <span data-i18n="historyCountLabel">saved</span></span>
+      </div>
+      <ul class="history-list" id="historyList"></ul>
+    </div>
+  </div>
+
+<script>
+const I18N = {
+  en: {
+    brand: 'Stat Roller',
+    crumbs: 'Character Creation › Ability Scores',
+    title1: 'Roll Your', title2: 'Ability Scores',
+    lede: '4d6 drop lowest · balanced to a total of 72',
+    totalLabel: 'Total Ability Score',
+    rollBtn: 'Roll Ability Scores',
+    infoTitle: 'How These Scores Are Generated',
+    info1: '<strong>Step 1 — Roll:</strong> Each ability uses the classic <strong>4d6 drop lowest</strong> method — four six-sided dice are rolled and the lowest is discarded.',
+    info2: '<strong>Step 2 — Proportional scaling:</strong> The six raw results are multiplied by <strong>72 / sum of raw rolls</strong>, so the total always equals 72 (same as the Standard Array: 15, 14, 13, 12, 10, 8).',
+    info3: '<strong>Step 3 — Round &amp; fix:</strong> Scaled values are rounded to integers and clamped to 3–18. Any rounding leftover is corrected on whichever stat was rounded the most, so the total lands exactly on 72.',
+    info4: '<strong>Why this is fair:</strong> The <em>shape</em> of your roll stays intact — the highest stat stays highest, the lowest stays lowest. A lucky roll just gets compressed, an unlucky one gets stretched. No more accidental Hercules vs. weakling.',
+    balanced: 'balanced',
+    historyTitle: 'Roll History', historyCountLabel: 'saved', clearBtn: 'Clear',
+    historyEmpty: 'No rolls saved yet. Hit the button to roll!',
+    historyRestore: 'View',
+  },
+  de: {
+    brand: 'Stat Roller',
+    crumbs: 'Charaktererstellung › Attributswerte',
+    title1: 'Würfle deine', title2: 'Attributswerte',
+    lede: '4W6, niedrigster fällt raus · ausbalanciert auf Summe 72',
+    totalLabel: 'Gesamtsumme',
+    rollBtn: 'Attribute würfeln',
+    infoTitle: 'Wie die Werte berechnet werden',
+    info1: '<strong>Schritt 1 — Würfeln:</strong> Jedes Attribut wird mit der klassischen <strong>4W6, niedrigsten streichen</strong>-Methode gewürfelt — vier sechsseitige Würfel, der niedrigste fliegt raus.',
+    info2: '<strong>Schritt 2 — Proportionale Skalierung:</strong> Die sechs Rohwerte werden mit <strong>72 / Summe der Rohwürfe</strong> multipliziert, sodass die Summe immer 72 ergibt (wie das Standard-Array: 15, 14, 13, 12, 10, 8).',
+    info3: '<strong>Schritt 3 — Runden &amp; korrigieren:</strong> Die skalierten Werte werden auf ganze Zahlen gerundet und auf 3–18 begrenzt. Rundungsreste werden bei dem Stat ausgeglichen, der am stärksten gerundet wurde, damit es exakt 72 sind.',
+    info4: '<strong>Warum das fair ist:</strong> Die <em>Form</em> deines Rolls bleibt erhalten — der höchste Wert bleibt der höchste, der niedrigste bleibt der niedrigste. Ein Glücksroll wird einfach gestaucht, ein Pechroll gestreckt. Kein zufälliger Herkules gegen Schwächling mehr.',
+    balanced: 'unverändert',
+    historyTitle: 'Verlauf', historyCountLabel: 'gespeichert', clearBtn: 'Leeren',
+    historyEmpty: 'Noch keine Rolls gespeichert. Klick auf den Button!',
+    historyRestore: 'Anzeigen',
+  },
+  es: {
+    brand: 'Generador de Stats',
+    crumbs: 'Creación de Personaje › Características',
+    title1: 'Tira tus', title2: 'Características',
+    lede: '4d6 descarta el menor · equilibrado a un total de 72',
+    totalLabel: 'Suma total',
+    rollBtn: 'Tirar características',
+    infoTitle: 'Cómo se generan estos valores',
+    info1: '<strong>Paso 1 — Tirada:</strong> Cada característica usa el método clásico <strong>4d6 descarta el menor</strong> — se tiran cuatro dados de seis caras y se descarta el más bajo.',
+    info2: '<strong>Paso 2 — Escalado proporcional:</strong> Los seis resultados se multiplican por <strong>72 / suma de las tiradas</strong>, para que el total siempre sea 72 (igual que el Array Estándar: 15, 14, 13, 12, 10, 8).',
+    info3: '<strong>Paso 3 — Redondeo y ajuste:</strong> Los valores escalados se redondean a enteros y se limitan al rango 3–18. Cualquier resto del redondeo se corrige en la característica más afectada, para que el total sea exactamente 72.',
+    info4: '<strong>Por qué es justo:</strong> La <em>forma</em> de tu tirada se mantiene — la más alta sigue siendo la más alta, la más baja sigue siendo la más baja. Una tirada con suerte se comprime, una con mala suerte se estira. Se acabaron los Hércules frente a los debiluchos por azar.',
+    balanced: 'sin cambios',
+    historyTitle: 'Historial', historyCountLabel: 'guardadas', clearBtn: 'Borrar',
+    historyEmpty: 'Aún no hay tiradas guardadas. ¡Pulsa el botón!',
+    historyRestore: 'Ver',
+  },
+  fr: {
+    brand: 'Lanceur de Stats',
+    crumbs: 'Création de personnage › Caractéristiques',
+    title1: 'Lancez vos', title2: 'Caractéristiques',
+    lede: '4d6 retirer le plus bas · équilibré à un total de 72',
+    totalLabel: 'Somme totale',
+    rollBtn: 'Lancer les caractéristiques',
+    infoTitle: 'Comment ces valeurs sont générées',
+    info1: '<strong>Étape 1 — Lancer :</strong> Chaque caractéristique utilise la méthode classique <strong>4d6 retirer le plus bas</strong> — quatre dés à six faces sont lancés et le plus faible est écarté.',
+    info2: '<strong>Étape 2 — Mise à l’échelle proportionnelle :</strong> Les six résultats bruts sont multipliés par <strong>72 / somme des lancers</strong>, pour que le total soit toujours 72 (comme le Tableau Standard : 15, 14, 13, 12, 10, 8).',
+    info3: '<strong>Étape 3 — Arrondi &amp; correction :</strong> Les valeurs mises à l’échelle sont arrondies à des entiers et bornées à 3–18. Tout reste d’arrondi est corrigé sur la caractéristique la plus affectée, pour atteindre exactement 72.',
+    info4: '<strong>Pourquoi c’est équitable :</strong> La <em>forme</em> de votre lancer est préservée — la plus haute reste la plus haute, la plus basse reste la plus basse. Un lancer chanceux est juste compressé, un malchanceux étiré. Fini l’Hercule contre le faiblard par hasard.',
+    balanced: 'inchangé',
+    historyTitle: 'Historique', historyCountLabel: 'enregistrés', clearBtn: 'Effacer',
+    historyEmpty: 'Aucun lancer enregistré. Cliquez sur le bouton !',
+    historyRestore: 'Voir',
+  },
+  zh: {
+    brand: '属性骰子',
+    crumbs: '角色创建 › 属性值',
+    title1: '掷出你的', title2: '属性值',
+    lede: '4d6去最低 · 平衡到总和 72',
+    totalLabel: '总和',
+    rollBtn: '掷属性骰',
+    infoTitle: '属性值是如何生成的',
+    info1: '<strong>第 1 步 — 投掷：</strong>每项属性使用经典的 <strong>4d6 去最低</strong> 方法——投四颗六面骰，去掉最低的一颗。',
+    info2: '<strong>第 2 步 — 按比例缩放：</strong>将六个原始结果乘以 <strong>72 / 原始总和</strong>，使总和始终为 72（与标准数组相同：15, 14, 13, 12, 10, 8）。',
+    info3: '<strong>第 3 步 — 四舍五入并修正：</strong>缩放后的值取整并限制在 3–18 之间。任何取整余数都会在被舍入最多的属性上修正，使总和正好为 72。',
+    info4: '<strong>为什么这样公平：</strong>你掷骰的<em>形状</em>被保留——最高的依然最高，最低的依然最低。运气好的掷骰只是被压缩，运气差的被拉伸。不再有偶然的大力士对弱鸡。',
+    balanced: '未调整',
+    historyTitle: '历史记录', historyCountLabel: '条已保存', clearBtn: '清空',
+    historyEmpty: '尚无保存的掷骰。点击按钮开始！',
+    historyRestore: '查看',
+  },
+};
+
+let currentLang = 'en';
+function applyLang(lang) {
+  currentLang = lang;
+  const dict = I18N[lang];
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key] !== undefined) el.innerHTML = dict[key];
+  });
+  document.documentElement.lang = lang;
+  document.querySelectorAll('#langSwitch button').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+  // re-render adjust labels in current language
+  if (window.__lastResults) render(window.__lastResults);
+  renderHistory();
+}
+document.getElementById('langSwitch').addEventListener('click', (e) => {
+  const btn = e.target.closest('button[data-lang]');
+  if (btn) applyLang(btn.dataset.lang);
+});
+
+const ABILITIES = [
+  { key: 'STR', name: 'Strength' },
+  { key: 'DEX', name: 'Dexterity' },
+  { key: 'CON', name: 'Constitution' },
+  { key: 'INT', name: 'Intelligence' },
+  { key: 'WIS', name: 'Wisdom' },
+  { key: 'CHA', name: 'Charisma' },
+];
+const TARGET = 72;
+const MIN = 3, MAX = 18;
+
+const rand = (n) => Math.floor(Math.random() * n);
+const d6 = () => rand(6) + 1;
+
+function roll4d6DropLowest() {
+  const rolls = [d6(), d6(), d6(), d6()];
+  const sorted = [...rolls].sort((a, b) => a - b);
+  const dropped = sorted[0];
+  const value = sorted[1] + sorted[2] + sorted[3];
+  return { rolls, droppedIndex: rolls.indexOf(dropped), value };
+}
+
+function modifier(v) {
+  const m = Math.floor((v - 10) / 2);
+  return (m >= 0 ? '+' : '') + m;
+}
+
+function balance(values) {
+  const rawSum = values.reduce((a, b) => a + b, 0);
+  const scale = TARGET / rawSum;
+
+  // Proportional scaling (float), then round, then clamp.
+  const scaled = values.map(v => v * scale);
+  let v = scaled.map(x => Math.round(x));
+  v = v.map(x => Math.max(MIN, Math.min(MAX, x)));
+
+  // Fix residual (from rounding + clamping) by nudging the stats whose
+  // rounded value is furthest from their true scaled value.
+  let safety = 1000;
+  while (v.reduce((a, b) => a + b, 0) !== TARGET && safety-- > 0) {
+    const sum = v.reduce((a, b) => a + b, 0);
+    if (sum > TARGET) {
+      // pick the stat that was rounded up the most (and can still go down)
+      let best = -1, bestErr = -Infinity;
+      for (let i = 0; i < v.length; i++) {
+        if (v[i] <= MIN) continue;
+        const err = v[i] - scaled[i]; // positive => rounded up
+        if (err > bestErr) { bestErr = err; best = i; }
+      }
+      if (best < 0) break;
+      v[best]--;
+    } else {
+      // pick the stat that was rounded down the most (and can still go up)
+      let best = -1, bestErr = -Infinity;
+      for (let i = 0; i < v.length; i++) {
+        if (v[i] >= MAX) continue;
+        const err = scaled[i] - v[i]; // positive => rounded down
+        if (err > bestErr) { bestErr = err; best = i; }
+      }
+      if (best < 0) break;
+      v[best]++;
+    }
+  }
+  return v;
+}
+
+function render(results) {
+  const container = document.getElementById('abilities');
+  container.innerHTML = '';
+  results.forEach((r, i) => {
+    const ab = ABILITIES[i];
+    const el = document.createElement('div');
+    el.className = 'ability rolling';
+    const diceHtml = r.rolls.map((x, j) =>
+      `<span class="die ${j === r.droppedIndex ? 'dropped' : ''}">${x}</span>`
+    ).join('');
+    const adjClass = r.adjusted > 0 ? 'plus' : r.adjusted < 0 ? 'minus' : 'zero';
+    const adjText = r.adjusted === 0 ? I18N[currentLang].balanced : (r.adjusted > 0 ? `+${r.adjusted}` : `${r.adjusted}`);
+    el.innerHTML = `
+      <div class="ability-name">${ab.key}</div>
+      <div class="ability-mod">${r.finalValue}</div>
+      <div class="ability-rolls">${diceHtml}</div>
+      <div class="ability-adjust ${adjClass}">${adjText}</div>
+      <div class="ability-score">${modifier(r.finalValue)}</div>
+    `;
+    container.appendChild(el);
+    setTimeout(() => el.classList.remove('rolling'), 500);
+  });
+  const total = results.reduce((a, b) => a + b.finalValue, 0);
+  document.getElementById('total').textContent = total;
+  window.__lastResults = results;
+}
+
+function rollAll() {
+  const raw = ABILITIES.map(() => roll4d6DropLowest());
+  const rawValues = raw.map(r => r.value);
+  const balanced = balance(rawValues);
+  const results = raw.map((r, i) => ({
+    ...r,
+    finalValue: balanced[i],
+    adjusted: balanced[i] - r.value,
+  }));
+  render(results);
+  saveToHistory(results);
+}
+
+const HISTORY_KEY = 'dnd-stat-roller-history-v1';
+const HISTORY_MAX = 20;
+
+function loadHistory() {
+  try {
+    const raw = localStorage.getItem(HISTORY_KEY);
+    if (!raw) return [];
+    const arr = JSON.parse(raw);
+    return Array.isArray(arr) ? arr : [];
+  } catch { return []; }
+}
+function persistHistory(h) {
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(h)); } catch {}
+}
+function saveToHistory(results) {
+  const entry = {
+    ts: Date.now(),
+    scores: results.map(r => r.finalValue),
+  };
+  const h = loadHistory();
+  h.unshift(entry);
+  if (h.length > HISTORY_MAX) h.length = HISTORY_MAX;
+  persistHistory(h);
+  renderHistory();
+}
+function clearHistory() {
+  persistHistory([]);
+  renderHistory();
+}
+function formatTime(ts) {
+  const d = new Date(ts);
+  try {
+    return d.toLocaleString(currentLang, { dateStyle: 'short', timeStyle: 'short' });
+  } catch {
+    return d.toLocaleString();
+  }
+}
+function restoreFromHistory(entry) {
+  const results = ABILITIES.map((_, i) => ({
+    rolls: [], droppedIndex: -1, value: entry.scores[i],
+    finalValue: entry.scores[i], adjusted: 0,
+  }));
+  render(results);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  const countEl = document.getElementById('historyCount');
+  const h = loadHistory();
+  countEl.textContent = h.length;
+  list.innerHTML = '';
+  if (!h.length) {
+    const li = document.createElement('li');
+    li.className = 'history-empty';
+    li.textContent = I18N[currentLang].historyEmpty;
+    list.appendChild(li);
+    return;
+  }
+  const maxScore = Math.max(...h.flatMap(e => e.scores));
+  h.forEach((entry, idx) => {
+    const li = document.createElement('li');
+    li.className = 'history-item';
+    const scoresHtml = entry.scores.map((s, i) =>
+      `<span class="history-score ${s === maxScore ? 'top' : ''}"><span class="k">${ABILITIES[i].key}</span><span class="v">${s}</span></span>`
+    ).join('');
+    li.innerHTML = `
+      <span class="history-time">${formatTime(entry.ts)}</span>
+      <span class="history-scores">${scoresHtml}</span>
+      <span class="history-restore">${I18N[currentLang].historyRestore} →</span>
+    `;
+    li.addEventListener('click', () => restoreFromHistory(entry));
+    list.appendChild(li);
+  });
+}
+
+document.getElementById('rollBtn').addEventListener('click', () => {
+  const btn = document.getElementById('rollBtn');
+  btn.disabled = true;
+  rollAll();
+  setTimeout(() => btn.disabled = false, 500);
+});
+
+applyLang('en');
+rollAll();
+</script>
+</body>
+</html>
