@@ -642,6 +642,25 @@ function balance(values) {
   return v;
 }
 
+function renderEmpty() {
+  const container = document.getElementById('abilities');
+  container.innerHTML = '';
+  ABILITIES.forEach(ab => {
+    const el = document.createElement('div');
+    el.className = 'ability';
+    el.innerHTML = `
+      <div class="ability-name">${ab.key}</div>
+      <div class="ability-mod" style="color:var(--muted);">—</div>
+      <div class="ability-rolls"></div>
+      <div class="ability-adjust zero"></div>
+      <div class="ability-score" style="color:var(--muted);">—</div>
+    `;
+    container.appendChild(el);
+  });
+  document.getElementById('total').textContent = '—';
+  window.__lastResults = null;
+}
+
 function render(results) {
   const container = document.getElementById('abilities');
   container.innerHTML = '';
@@ -765,7 +784,18 @@ document.getElementById('rollBtn').addEventListener('click', () => {
 });
 
 applyLang('en');
-rollAll();
+const __h = loadHistory();
+if (__h.length) {
+  // show last roll without saving a new entry
+  const entry = __h[0];
+  const results = ABILITIES.map((_, i) => ({
+    rolls: [], droppedIndex: -1, value: entry.scores[i],
+    finalValue: entry.scores[i], adjusted: 0,
+  }));
+  render(results);
+} else {
+  renderEmpty();
+}
 </script>
 </body>
 </html>
