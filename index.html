@@ -243,6 +243,79 @@
     color: var(--muted);
     font-size: 1rem;
   }
+  .btn-icon {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    margin-left: .5rem;
+    cursor: pointer;
+    color: var(--ink-soft);
+    font-size: .9rem;
+    line-height: 1;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .15s, color .15s, border-color .15s;
+    vertical-align: middle;
+  }
+  .btn-icon:hover { background: var(--crimson); color: #fff; border-color: var(--crimson); }
+  .target-editor {
+    display: none;
+    align-items: center;
+    gap: .5rem;
+    margin-top: .75rem;
+    padding-top: .75rem;
+    border-top: 1px dashed var(--border);
+    flex-wrap: wrap;
+  }
+  .target-editor.open { display: flex; }
+  .target-editor input[type="number"] {
+    width: 80px;
+    padding: .4rem .5rem;
+    font-family: 'Roboto Condensed', sans-serif;
+    font-size: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    background: #fafafa;
+  }
+  .target-editor input[type="number"]:focus { outline: 2px solid var(--crimson); border-color: var(--crimson); }
+  .preset-chip {
+    font-family: 'Roboto Condensed', sans-serif;
+    font-weight: 700;
+    font-size: .72rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: .4rem .6rem;
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    cursor: pointer;
+    transition: background .15s, color .15s, border-color .15s;
+  }
+  .preset-chip:hover { border-color: var(--crimson); color: var(--crimson); }
+  .preset-chip.active { background: var(--crimson); color: #fff; border-color: var(--crimson); }
+  .editor-label {
+    font-size: .72rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: .25rem;
+  }
+  .history-target-badge {
+    display: inline-block;
+    margin-left: .35rem;
+    padding: 1px 5px;
+    font-size: .6rem;
+    letter-spacing: .05em;
+    background: #f0f0f0;
+    color: var(--muted);
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
 
   /* Roll button */
   .controls {
@@ -440,9 +513,22 @@
 
     <div class="abilities" id="abilities"></div>
 
-    <div class="summary">
-      <span class="summary-label" data-i18n="totalLabel">Total Ability Score</span>
-      <span class="summary-value"><span id="total">—</span> <span class="target">/ 72</span></span>
+    <div class="summary" style="flex-direction:column;align-items:stretch;">
+      <div style="display:flex;justify-content:space-between;align-items:center;width:100%;">
+        <span class="summary-label" data-i18n="totalLabel">Total Ability Score</span>
+        <span class="summary-value">
+          <span id="total">—</span>
+          <span class="target">/ <span id="targetValue">72</span></span>
+          <button class="btn-icon" id="editTargetBtn" title="Edit target" aria-label="Edit target">✎</button>
+        </span>
+      </div>
+      <div class="target-editor" id="targetEditor">
+        <span class="editor-label" data-i18n="targetLabel">Target</span>
+        <input type="number" id="targetInput" min="36" max="108" step="1" />
+        <button class="preset-chip" data-preset="60" data-i18n="presetGritty">Gritty 60</button>
+        <button class="preset-chip" data-preset="72" data-i18n="presetStandard">Standard 72</button>
+        <button class="preset-chip" data-preset="84" data-i18n="presetHeroic">Heroic 84</button>
+      </div>
     </div>
 
     <div class="controls">
@@ -472,7 +558,8 @@ const I18N = {
     brand: 'Stat Roller',
     crumbs: 'Character Creation › Ability Scores',
     title1: 'Roll Your', title2: 'Ability Scores',
-    lede: '4d6 drop lowest · balanced to a total of 72',
+    lede: '4d6 drop lowest · balanced to a total of {target}',
+    targetLabel: 'Target', presetGritty: 'Gritty 60', presetStandard: 'Standard 72', presetHeroic: 'Heroic 84',
     totalLabel: 'Total Ability Score',
     rollBtn: 'Roll Ability Scores',
     infoTitle: 'How These Scores Are Generated',
@@ -489,7 +576,8 @@ const I18N = {
     brand: 'Stat Roller',
     crumbs: 'Charaktererstellung › Attributswerte',
     title1: 'Würfle deine', title2: 'Attributswerte',
-    lede: '4W6, niedrigster fällt raus · ausbalanciert auf Summe 72',
+    lede: '4W6, niedrigster fällt raus · ausbalanciert auf Summe {target}',
+    targetLabel: 'Ziel', presetGritty: 'Gritty 60', presetStandard: 'Standard 72', presetHeroic: 'Heroisch 84',
     totalLabel: 'Gesamtsumme',
     rollBtn: 'Attribute würfeln',
     infoTitle: 'Wie die Werte berechnet werden',
@@ -506,7 +594,8 @@ const I18N = {
     brand: 'Generador de Stats',
     crumbs: 'Creación de Personaje › Características',
     title1: 'Tira tus', title2: 'Características',
-    lede: '4d6 descarta el menor · equilibrado a un total de 72',
+    lede: '4d6 descarta el menor · equilibrado a un total de {target}',
+    targetLabel: 'Objetivo', presetGritty: 'Crudo 60', presetStandard: 'Estándar 72', presetHeroic: 'Heroico 84',
     totalLabel: 'Suma total',
     rollBtn: 'Tirar características',
     infoTitle: 'Cómo se generan estos valores',
@@ -523,7 +612,8 @@ const I18N = {
     brand: 'Lanceur de Stats',
     crumbs: 'Création de personnage › Caractéristiques',
     title1: 'Lancez vos', title2: 'Caractéristiques',
-    lede: '4d6 retirer le plus bas · équilibré à un total de 72',
+    lede: '4d6 retirer le plus bas · équilibré à un total de {target}',
+    targetLabel: 'Cible', presetGritty: 'Réaliste 60', presetStandard: 'Standard 72', presetHeroic: 'Héroïque 84',
     totalLabel: 'Somme totale',
     rollBtn: 'Lancer les caractéristiques',
     infoTitle: 'Comment ces valeurs sont générées',
@@ -540,7 +630,8 @@ const I18N = {
     brand: '属性骰子',
     crumbs: '角色创建 › 属性值',
     title1: '掷出你的', title2: '属性值',
-    lede: '4d6去最低 · 平衡到总和 72',
+    lede: '4d6去最低 · 平衡到总和 {target}',
+    targetLabel: '目标', presetGritty: '严酷 60', presetStandard: '标准 72', presetHeroic: '英雄 84',
     totalLabel: '总和',
     rollBtn: '掷属性骰',
     infoTitle: '属性值是如何生成的',
@@ -567,10 +658,43 @@ function applyLang(lang) {
   document.querySelectorAll('#langSwitch button').forEach(b => {
     b.classList.toggle('active', b.dataset.lang === lang);
   });
+  updateLede();
   // re-render adjust labels in current language
   if (window.__lastResults) render(window.__lastResults);
   renderHistory();
 }
+
+function updateLede() {
+  const lede = document.querySelector('[data-i18n="lede"]');
+  if (!lede) return;
+  const tpl = I18N[currentLang].lede || '';
+  lede.innerHTML = tpl.replace('{target}', TARGET);
+}
+
+function applyTarget(newVal, persist = true) {
+  const v = Math.max(TARGET_MIN, Math.min(TARGET_MAX, Math.round(newVal)));
+  TARGET = v;
+  if (persist) { try { localStorage.setItem(TARGET_KEY, String(v)); } catch {} }
+  document.getElementById('targetValue').textContent = v;
+  document.getElementById('targetInput').value = v;
+  document.querySelectorAll('.preset-chip').forEach(c => {
+    c.classList.toggle('active', parseInt(c.dataset.preset, 10) === v);
+  });
+  updateLede();
+}
+
+document.getElementById('editTargetBtn').addEventListener('click', () => {
+  document.getElementById('targetEditor').classList.toggle('open');
+});
+document.getElementById('targetInput').addEventListener('input', (e) => {
+  const v = parseInt(e.target.value, 10);
+  if (Number.isFinite(v)) applyTarget(v);
+});
+document.querySelectorAll('.preset-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    applyTarget(parseInt(chip.dataset.preset, 10));
+  });
+});
 document.getElementById('langSwitch').addEventListener('click', (e) => {
   const btn = e.target.closest('button[data-lang]');
   if (btn) applyLang(btn.dataset.lang);
@@ -584,7 +708,16 @@ const ABILITIES = [
   { key: 'WIS', name: 'Wisdom' },
   { key: 'CHA', name: 'Charisma' },
 ];
-const TARGET = 72;
+const TARGET_DEFAULT = 72;
+const TARGET_MIN = 36, TARGET_MAX = 108;
+const TARGET_KEY = 'dnd-stat-roller-target-v1';
+let TARGET = (() => {
+  try {
+    const v = parseInt(localStorage.getItem(TARGET_KEY), 10);
+    if (Number.isFinite(v) && v >= TARGET_MIN && v <= TARGET_MAX) return v;
+  } catch {}
+  return TARGET_DEFAULT;
+})();
 const MIN = 3, MAX = 18;
 
 const rand = (n) => Math.floor(Math.random() * n);
@@ -719,6 +852,7 @@ function saveToHistory(results) {
   const entry = {
     ts: Date.now(),
     scores: results.map(r => r.finalValue),
+    target: TARGET,
   };
   const h = loadHistory();
   h.unshift(entry);
@@ -766,8 +900,9 @@ function renderHistory() {
     const scoresHtml = entry.scores.map((s, i) =>
       `<span class="history-score ${s === maxScore ? 'top' : ''}"><span class="k">${ABILITIES[i].key}</span><span class="v">${s}</span></span>`
     ).join('');
+    const tgt = entry.target || TARGET_DEFAULT;
     li.innerHTML = `
-      <span class="history-time">${formatTime(entry.ts)}</span>
+      <span class="history-time">${formatTime(entry.ts)}<span class="history-target-badge">Σ${tgt}</span></span>
       <span class="history-scores">${scoresHtml}</span>
       <span class="history-restore">${I18N[currentLang].historyRestore} →</span>
     `;
@@ -784,6 +919,7 @@ document.getElementById('rollBtn').addEventListener('click', () => {
 });
 
 applyLang('en');
+applyTarget(TARGET, false);
 const __h = loadHistory();
 if (__h.length) {
   // show last roll without saving a new entry
