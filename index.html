@@ -632,8 +632,8 @@ const I18N = {
     infoTitle: 'How These Scores Are Generated',
     info1: '<strong>Step 1 — Roll:</strong> Each ability uses the classic <strong>4d6 drop lowest</strong> method — four six-sided dice are rolled and the lowest is discarded.',
     info1_3d6: '<strong>Step 1 — Roll:</strong> Each ability is rolled with <strong>3d6 straight</strong> — three six-sided dice are rolled and summed. Wider variance, more highs and lows.',
-    info2: '<strong>Step 2 — Proportional scaling:</strong> The six raw results are multiplied by <strong>72 / sum of raw rolls</strong>, so the total always equals 72 (same as the Standard Array: 15, 14, 13, 12, 10, 8).',
-    info3: '<strong>Step 3 — Round &amp; fix:</strong> Scaled values are rounded to integers and clamped to 3–18. Any rounding leftover is corrected on whichever stat was rounded the most, so the total lands exactly on 72.',
+    info2: '<strong>Step 2 — Proportional scaling:</strong> The six raw results are multiplied by <strong>{target} / sum of raw rolls</strong>, so the total always equals {target} (the Standard Array sums to 72: 15, 14, 13, 12, 10, 8).',
+    info3: '<strong>Step 3 — Round &amp; fix:</strong> Scaled values are rounded to integers and clamped to 3–18. Any rounding leftover is corrected on whichever stat was rounded the most, so the total lands exactly on {target}.',
     info4: '<strong>Why this is fair:</strong> The <em>shape</em> of your roll stays intact — the highest stat stays highest, the lowest stays lowest. A lucky roll just gets compressed, an unlucky one gets stretched. No more accidental Hercules vs. weakling.',
     balanced: 'balanced',
     historyTitle: 'Roll History', historyCountLabel: 'saved', clearBtn: 'Clear',
@@ -654,8 +654,8 @@ const I18N = {
     infoTitle: 'Wie die Werte berechnet werden',
     info1: '<strong>Schritt 1 — Würfeln:</strong> Jedes Attribut wird mit der klassischen <strong>4W6, niedrigsten streichen</strong>-Methode gewürfelt — vier sechsseitige Würfel, der niedrigste fliegt raus.',
     info1_3d6: '<strong>Schritt 1 — Würfeln:</strong> Jedes Attribut wird mit <strong>3W6 direkt</strong> gewürfelt — drei sechsseitige Würfel werden zusammengezählt. Größere Streuung, mehr Spitzen und Tiefen.',
-    info2: '<strong>Schritt 2 — Proportionale Skalierung:</strong> Die sechs Rohwerte werden mit <strong>72 / Summe der Rohwürfe</strong> multipliziert, sodass die Summe immer 72 ergibt (wie das Standard-Array: 15, 14, 13, 12, 10, 8).',
-    info3: '<strong>Schritt 3 — Runden &amp; korrigieren:</strong> Die skalierten Werte werden auf ganze Zahlen gerundet und auf 3–18 begrenzt. Rundungsreste werden bei dem Stat ausgeglichen, der am stärksten gerundet wurde, damit es exakt 72 sind.',
+    info2: '<strong>Schritt 2 — Proportionale Skalierung:</strong> Die sechs Rohwerte werden mit <strong>{target} / Summe der Rohwürfe</strong> multipliziert, sodass die Summe immer {target} ergibt (das Standard-Array summiert sich auf 72: 15, 14, 13, 12, 10, 8).',
+    info3: '<strong>Schritt 3 — Runden &amp; korrigieren:</strong> Die skalierten Werte werden auf ganze Zahlen gerundet und auf 3–18 begrenzt. Rundungsreste werden bei dem Stat ausgeglichen, der am stärksten gerundet wurde, damit es exakt {target} sind.',
     info4: '<strong>Warum das fair ist:</strong> Die <em>Form</em> deines Rolls bleibt erhalten — der höchste Wert bleibt der höchste, der niedrigste bleibt der niedrigste. Ein Glücksroll wird einfach gestaucht, ein Pechroll gestreckt. Kein zufälliger Herkules gegen Schwächling mehr.',
     balanced: 'unverändert',
     historyTitle: 'Verlauf', historyCountLabel: 'gespeichert', clearBtn: 'Leeren',
@@ -676,8 +676,8 @@ const I18N = {
     infoTitle: 'Cómo se generan estos valores',
     info1: '<strong>Paso 1 — Tirada:</strong> Cada característica usa el método clásico <strong>4d6 descarta el menor</strong> — se tiran cuatro dados de seis caras y se descarta el más bajo.',
     info1_3d6: '<strong>Paso 1 — Tirada:</strong> Cada característica se tira con <strong>3d6 directo</strong> — tres dados de seis caras sumados sin descartar. Mayor varianza, más altos y más bajos.',
-    info2: '<strong>Paso 2 — Escalado proporcional:</strong> Los seis resultados se multiplican por <strong>72 / suma de las tiradas</strong>, para que el total siempre sea 72 (igual que el Array Estándar: 15, 14, 13, 12, 10, 8).',
-    info3: '<strong>Paso 3 — Redondeo y ajuste:</strong> Los valores escalados se redondean a enteros y se limitan al rango 3–18. Cualquier resto del redondeo se corrige en la característica más afectada, para que el total sea exactamente 72.',
+    info2: '<strong>Paso 2 — Escalado proporcional:</strong> Los seis resultados se multiplican por <strong>{target} / suma de las tiradas</strong>, para que el total siempre sea {target} (el Array Estándar suma 72: 15, 14, 13, 12, 10, 8).',
+    info3: '<strong>Paso 3 — Redondeo y ajuste:</strong> Los valores escalados se redondean a enteros y se limitan al rango 3–18. Cualquier resto del redondeo se corrige en la característica más afectada, para que el total sea exactamente {target}.',
     info4: '<strong>Por qué es justo:</strong> La <em>forma</em> de tu tirada se mantiene — la más alta sigue siendo la más alta, la más baja sigue siendo la más baja. Una tirada con suerte se comprime, una con mala suerte se estira. Se acabaron los Hércules frente a los debiluchos por azar.',
     balanced: 'sin cambios',
     historyTitle: 'Historial', historyCountLabel: 'guardadas', clearBtn: 'Borrar',
@@ -698,8 +698,8 @@ const I18N = {
     infoTitle: 'Comment ces valeurs sont générées',
     info1: '<strong>Étape 1 — Lancer :</strong> Chaque caractéristique utilise la méthode classique <strong>4d6 retirer le plus bas</strong> — quatre dés à six faces sont lancés et le plus faible est écarté.',
     info1_3d6: '<strong>Étape 1 — Lancer :</strong> Chaque caractéristique est lancée avec <strong>3d6 direct</strong> — trois dés à six faces additionnés sans en retirer. Variance plus large, plus de pics et de creux.',
-    info2: '<strong>Étape 2 — Mise à l’échelle proportionnelle :</strong> Les six résultats bruts sont multipliés par <strong>72 / somme des lancers</strong>, pour que le total soit toujours 72 (comme le Tableau Standard : 15, 14, 13, 12, 10, 8).',
-    info3: '<strong>Étape 3 — Arrondi &amp; correction :</strong> Les valeurs mises à l’échelle sont arrondies à des entiers et bornées à 3–18. Tout reste d’arrondi est corrigé sur la caractéristique la plus affectée, pour atteindre exactement 72.',
+    info2: '<strong>Étape 2 — Mise à l’échelle proportionnelle :</strong> Les six résultats bruts sont multipliés par <strong>{target} / somme des lancers</strong>, pour que le total soit toujours {target} (le Tableau Standard fait 72 : 15, 14, 13, 12, 10, 8).',
+    info3: '<strong>Étape 3 — Arrondi &amp; correction :</strong> Les valeurs mises à l’échelle sont arrondies à des entiers et bornées à 3–18. Tout reste d’arrondi est corrigé sur la caractéristique la plus affectée, pour atteindre exactement {target}.',
     info4: '<strong>Pourquoi c’est équitable :</strong> La <em>forme</em> de votre lancer est préservée — la plus haute reste la plus haute, la plus basse reste la plus basse. Un lancer chanceux est juste compressé, un malchanceux étiré. Fini l’Hercule contre le faiblard par hasard.',
     balanced: 'inchangé',
     historyTitle: 'Historique', historyCountLabel: 'enregistrés', clearBtn: 'Effacer',
@@ -720,8 +720,8 @@ const I18N = {
     infoTitle: '属性值是如何生成的',
     info1: '<strong>第 1 步 — 投掷：</strong>每项属性使用经典的 <strong>4d6 去最低</strong> 方法——投四颗六面骰，去掉最低的一颗。',
     info1_3d6: '<strong>第 1 步 — 投掷：</strong>每项属性使用 <strong>3d6 直接</strong> 方式——投三颗六面骰并相加，不去除任何一颗。方差更大，更多高分与低分。',
-    info2: '<strong>第 2 步 — 按比例缩放：</strong>将六个原始结果乘以 <strong>72 / 原始总和</strong>，使总和始终为 72（与标准数组相同：15, 14, 13, 12, 10, 8）。',
-    info3: '<strong>第 3 步 — 四舍五入并修正：</strong>缩放后的值取整并限制在 3–18 之间。任何取整余数都会在被舍入最多的属性上修正，使总和正好为 72。',
+    info2: '<strong>第 2 步 — 按比例缩放：</strong>将六个原始结果乘以 <strong>{target} / 原始总和</strong>，使总和始终为 {target}（标准数组的总和为 72：15, 14, 13, 12, 10, 8）。',
+    info3: '<strong>第 3 步 — 四舍五入并修正：</strong>缩放后的值取整并限制在 3–18 之间。任何取整余数都会在被舍入最多的属性上修正，使总和正好为 {target}。',
     info4: '<strong>为什么这样公平：</strong>你掷骰的<em>形状</em>被保留——最高的依然最高，最低的依然最低。运气好的掷骰只是被压缩，运气差的被拉伸。不再有偶然的大力士对弱鸡。',
     balanced: '未调整',
     historyTitle: '历史记录', historyCountLabel: '条已保存', clearBtn: '清空',
@@ -760,6 +760,10 @@ function updateLede() {
     const key = MODE === '3d6' ? 'info1_3d6' : 'info1';
     info1.innerHTML = I18N[currentLang][key] || I18N[currentLang].info1 || '';
   }
+  ['info2', 'info3'].forEach(k => {
+    const el = document.querySelector(`[data-i18n="${k}"]`);
+    if (el) el.innerHTML = (I18N[currentLang][k] || '').replace(/\{target\}/g, TARGET);
+  });
 }
 
 function applyMode(newMode, persist = true) {
