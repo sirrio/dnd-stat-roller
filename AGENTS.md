@@ -37,9 +37,10 @@ requirements.
 
 - GitHub Pages serves production at
   `https://sirrio.github.io/dnd-stat-roller/` directly from the root of `main`.
-- Merging a pull request to `main` automatically deploys production. Merge
-  approval therefore also approves deployment and must state both actions
-  explicitly.
+- `.github/workflows/deploy.yml` tests and deploys the repository root on every
+  push to `main`. Merging a pull request therefore automatically deploys
+  production. Merge approval also approves deployment and must state both
+  actions explicitly.
 - After deployment, smoke-test the live URL on desktop and mobile before
   creating the annotated version tag and matching GitHub release.
 - `package.json`, the root package metadata in `package-lock.json`, the release
