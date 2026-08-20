@@ -31,7 +31,8 @@ requirements.
   `.github/workflows/ci.yml`.
 - For UI or interaction changes, verify the live-equivalent page on desktop and
   mobile. Cover both dice methods, target editing, all language controls, a
-  completed roll, history restore/clear, and the absence of horizontal overflow.
+  completed roll, history persistence and restore, and the absence of
+  horizontal overflow.
 
 ## Deployment and release
 
