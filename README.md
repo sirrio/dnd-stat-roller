@@ -1,6 +1,10 @@
 # D&D Stat Roller
 
-A balanced **4d6-drop-lowest** ability score roller for D&D 5e — styled after D&D Beyond. Every roll is automatically scaled so the six final scores **always sum to 72** (same total as the official Standard Array), eliminating power swings between characters without flattening the shape of the roll.
+A balanced ability score roller for D&D 5e — styled after D&D Beyond. Choose
+**4d6 drop lowest** or **straight 3d6** and a target total from 36 through 108.
+Every roll is automatically scaled so the six final scores reach that target
+without flattening the shape of the roll. The default target is **72**, the
+same total as the official Standard Array.
 
 🎲 **Live:** https://sirrio.github.io/dnd-stat-roller/
 
@@ -8,8 +12,8 @@ A balanced **4d6-drop-lowest** ability score roller for D&D 5e — styled after 
 
 ## Features
 
-- 🎲 Classic **4d6 drop lowest** for all six abilities (STR, DEX, CON, INT, WIS, CHA)
-- ⚖ **Proportional balancing** — total always equals 72; rank order of your rolls is preserved
+- 🎲 **4d6 drop lowest** or **straight 3d6** for all six abilities (STR, DEX, CON, INT, WIS, CHA)
+- ⚖ **Proportional balancing** — choose a total from 36 through 108; rank order is preserved
 - 🎨 D&D Beyond-inspired UI with crimson accents and Bree Serif headings
 - 🌍 **5 languages** built in: EN, DE, ES, FR, 中文 (switch in top-right)
 - 📜 **Local history** of up to 20 past rolls (stored in `localStorage`) — click any entry to re-display it
@@ -17,10 +21,10 @@ A balanced **4d6-drop-lowest** ability score roller for D&D 5e — styled after 
 
 ## How the balancing works
 
-1. **Roll** 4d6 drop lowest for each of the 6 abilities.
-2. **Scale** every value by `72 / sum_of_raw_rolls` (a float).
+1. **Roll** the selected dice method for each of the 6 abilities.
+2. **Scale** every value by `target / sum_of_raw_rolls` (a float).
 3. **Round** to integers and clamp to the 3–18 range.
-4. **Fix** any rounding leftover by nudging the stat that was rounded the most, until the total lands exactly on 72.
+4. **Fix** any rounding leftover by nudging the stat that was rounded the most, until the total lands exactly on the target.
 
 This preserves the *shape* of your roll: the highest score stays the highest, the lowest stays the lowest. A lucky roll just gets compressed, an unlucky one stretched. No more Hercules-vs-weakling at the same table by sheer luck.
 
@@ -34,6 +38,15 @@ start index.html
 
 # or serve it (any static server works)
 python -m http.server 8000
+```
+
+## Testing
+
+The test suite uses Node.js built-ins and has no third-party dependencies.
+
+```sh
+npm ci
+npm test
 ```
 
 ## Deploying
