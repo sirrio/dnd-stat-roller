@@ -1,6 +1,6 @@
 {
   "name": "dnd-stat-roller",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "A balanced, browser-local D&D 5e ability score roller.",
   "scripts": {
