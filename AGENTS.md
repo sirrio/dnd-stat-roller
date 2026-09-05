@@ -25,14 +25,19 @@ requirements.
 
 - Run `npm ci` when a clean installation is required. The lockfile intentionally
   contains no third-party packages.
-- Run `npm test` for JavaScript syntax, product-contract, dice-mode, balancing,
-  localization, local-storage, and legal-link checks.
-- Pull requests run the same test suite on Node 22 through
-  `.github/workflows/ci.yml`.
-- For UI or interaction changes, verify the live-equivalent page on desktop and
-  mobile. Cover both dice methods, target editing, all language controls, a
-  completed roll, history persistence and restore, and the absence of
-  horizontal overflow.
+- During Coding, select the checks for the changed behavior and verify UI
+  changes in the directly affected flows and viewports.
+- In the PR phase, run `npm test` for JavaScript syntax, product-contract,
+  dice-mode, balancing, localization, local-storage, and legal-link checks.
+- For UI or interaction changes, the full PR browser check covers desktop and
+  mobile: both dice methods, target editing, all language controls, a completed
+  roll, history persistence and restore, and the absence of horizontal overflow.
+- Pull requests currently run the same automated test suite on Node 22 through
+  `.github/workflows/ci.yml`, including Draft PRs; CI does not yet distinguish
+  the two phases.
+- For browser checks, the user starts the README's `python -m http.server 8000`
+  from the repository root. Check `http://127.0.0.1:8000/` for a successful
+  response before browser tests. No build, backend, or database is required.
 
 ## Deployment and release
 

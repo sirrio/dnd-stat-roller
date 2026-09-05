@@ -41,7 +41,7 @@ test('application script is valid JavaScript', () => {
 });
 
 test('version and static product contracts stay explicit', () => {
-  assert.equal(packageJson.version, '1.0.0');
+  assert.equal(packageJson.version, '1.0.1');
   assert.match(html, /const TARGET_DEFAULT = 72;/);
   assert.match(html, /const TARGET_MIN = 36, TARGET_MAX = 108;/);
   assert.match(html, /const HISTORY_MAX = 20;/);
